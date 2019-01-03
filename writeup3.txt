@@ -1,0 +1,4 @@
+Boot Loader :
+1- Lancer la VM
+2- Dés le chargement de VMWare spammer la touche shift jusqu'a temps que la VM affiche un prompt "boot:", si non restart la vm
+3- Lancer live init=/bin/sh

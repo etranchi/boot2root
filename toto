@@ -1,0 +1,99 @@
+Spectre and Meltdown mitigation detection tool v0.40
+
+Checking for vulnerabilities on current system
+Kernel is [35mLinux 3.2.0-91-generic-pae #129-Ubuntu SMP Wed Sep 9 11:27:47 UTC 2015 i686[0m
+CPU is [35mIntel(R) Core(TM) i5-3470S CPU @ 2.90GHz[0m
+
+[1;34mHardware check[0m
+* Hardware support (CPU microcode) for mitigation techniques
+  * Indirect Branch Restricted Speculation (IBRS)
+    * SPEC_CTRL MSR is available: [42m[30m YES [0m
+    * CPU indicates IBRS capability: [43m[30m NO [0m
+  * Indirect Branch Prediction Barrier (IBPB)
+    * PRED_CMD MSR is available: [42m[30m YES [0m
+    * CPU indicates IBPB capability: [43m[30m NO [0m
+  * Single Thread Indirect Branch Predictors (STIBP)
+    * SPEC_CTRL MSR is available: [42m[30m YES [0m
+    * CPU indicates STIBP capability: [43m[30m NO [0m
+  * Speculative Store Bypass Disable (SSBD)
+    * CPU indicates SSBD capability: [43m[30m NO [0m
+  * L1 data cache invalidation
+    * FLUSH_CMD MSR is available: [42m[30m YES [0m
+    * CPU indicates L1D flush capability: [43m[30m NO [0m
+  * Enhanced IBRS (IBRS_ALL)
+    * CPU indicates ARCH_CAPABILITIES MSR availability: [43m[30m NO [0m
+    * ARCH_CAPABILITIES MSR advertises IBRS_ALL capability: [43m[30m NO [0m
+  * CPU explicitly indicates not being vulnerable to Meltdown (RDCL_NO): [43m[30m NO [0m
+  * CPU explicitly indicates not being vulnerable to Variant 4 (SSB_NO): [43m[30m NO [0m
+  * CPU/Hypervisor indicates L1D flushing is not necessary on this system: [43m[30m NO [0m
+  * Hypervisor indicates host CPU might be vulnerable to RSB underflow (RSBA): [44m[30m NO [0m
+  * CPU supports Software Guard Extensions (SGX): [42m[30m NO [0m
+  * CPU microcode is known to cause stability problems: [44m[30m NO [0m (model 0x3a family 0x6 stepping 0x9 ucode 0x15 cpuid 0x306a9)
+  * CPU microcode is the latest known available version: [41m[30m NO [0m (latest version is 0x20 dated 2018/04/10 according to builtin MCExtractor DB v84 - 2018/09/27)
+* CPU vulnerability to the speculative execution attack variants
+  * Vulnerable to CVE-2017-5753 (Spectre Variant 1, bounds check bypass): [43m[30m YES [0m
+  * Vulnerable to CVE-2017-5715 (Spectre Variant 2, branch target injection): [43m[30m YES [0m
+  * Vulnerable to CVE-2017-5754 (Variant 3, Meltdown, rogue data cache load): [43m[30m YES [0m
+  * Vulnerable to CVE-2018-3640 (Variant 3a, rogue system register read): [43m[30m YES [0m
+  * Vulnerable to CVE-2018-3639 (Variant 4, speculative store bypass): [43m[30m YES [0m
+  * Vulnerable to CVE-2018-3615 (Foreshadow (SGX), L1 terminal fault): [42m[30m NO [0m
+  * Vulnerable to CVE-2018-3620 (Foreshadow-NG (OS), L1 terminal fault): [43m[30m YES [0m
+  * Vulnerable to CVE-2018-3646 (Foreshadow-NG (VMM), L1 terminal fault): [43m[30m YES [0m
+
+[1;34mCVE-2017-5753 aka 'Spectre Variant 1, bounds check bypass'[0m
+* Kernel has array_index_mask_nospec: [43m[30m NO [0m
+* Kernel has the Red Hat/Ubuntu patch: [43m[30m NO [0m
+* Kernel has mask_nospec64 (arm64): [43m[30m NO [0m
+* Checking count of LFENCE instructions following a jump in kernel... [43m[30m NO [0m (only 0 jump-then-lfence instructions found, should be >= 30 (heuristic))
+> [46m[30mSTATUS:[0m [41m[30m VULNERABLE [0m (Kernel source needs to be patched to mitigate the vulnerability)
+
+[1;34mCVE-2017-5715 aka 'Spectre Variant 2, branch target injection'[0m
+* Mitigation 1
+  * Kernel is compiled with IBRS support: [43m[30m NO [0m
+    * IBRS enabled and active: [43m[30m NO [0m
+  * Kernel is compiled with IBPB support: [43m[30m NO [0m
+    * IBPB enabled and active: [43m[30m NO [0m
+* Mitigation 2
+  * Kernel has branch predictor hardening (arm): [43m[30m NO [0m
+  * Kernel compiled with retpoline option: [43m[30m NO [0m
+> [46m[30mSTATUS:[0m [41m[30m VULNERABLE [0m (IBRS+IBPB or retpoline+IBPB is needed to mitigate the vulnerability)
+
+[1;34mCVE-2017-5754 aka 'Variant 3, Meltdown, rogue data cache load'[0m
+* Kernel supports Page Table Isolation (PTI): [43m[30m NO [0m
+  * PTI enabled and active: [43m[30m NO [0m
+  * Reduced performance impact of PTI: [42m[30m YES [0m (CPU supports PCID, performance impact of PTI will be reduced)
+* Running as a Xen PV DomU: [44m[30m NO [0m
+> [46m[30mSTATUS:[0m [41m[30m VULNERABLE [0m (PTI is needed to mitigate the vulnerability)
+
+[1;34mCVE-2018-3640 aka 'Variant 3a, rogue system register read'[0m
+* CPU microcode mitigates the vulnerability: [43m[30m NO [0m
+> [46m[30mSTATUS:[0m [41m[30m VULNERABLE [0m (an up-to-date CPU microcode is needed to mitigate this vulnerability)
+
+[1;34mCVE-2018-3639 aka 'Variant 4, speculative store bypass'[0m
+* Kernel supports speculation store bypass: [43m[30m NO [0m
+> [46m[30mSTATUS:[0m [41m[30m VULNERABLE [0m (Neither your CPU nor your kernel support SSBD)
+
+[1;34mCVE-2018-3615 aka 'Foreshadow (SGX), L1 terminal fault'[0m
+* CPU microcode mitigates the vulnerability: [44m[30m N/A [0m
+> [46m[30mSTATUS:[0m [42m[30m NOT VULNERABLE [0m (your CPU vendor reported your CPU model as not vulnerable)
+
+[1;34mCVE-2018-3620 aka 'Foreshadow-NG (OS), L1 terminal fault'[0m
+* Kernel supports PTE inversion: [43m[30m NO [0m
+* PTE inversion enabled and active: [43m[30m UNKNOWN [0m (sysfs interface not available)
+> [46m[30mSTATUS:[0m [41m[30m VULNERABLE [0m (Your kernel doesn't support PTE inversion, update it)
+
+[1;34mCVE-2018-3646 aka 'Foreshadow-NG (VMM), L1 terminal fault'[0m
+* This system is a host running an hypervisor: [42m[30m NO [0m
+* Mitigation 1 (KVM)
+  * EPT is disabled: [44m[30m N/A [0m (the kvm_intel module is not loaded)
+* Mitigation 2
+  * L1D flush is supported by kernel: [43m[30m NO [0m
+  * L1D flush enabled: [43m[30m UNKNOWN [0m (can't find or read /sys/devices/system/cpu/vulnerabilities/l1tf)
+  * Hardware-backed L1D flush supported: [44m[30m NO [0m (flush will be done in software, this is slower)
+  * Hyper-Threading (SMT) is enabled: [43m[30m UNKNOWN [0m
+> [46m[30mSTATUS:[0m [42m[30m NOT VULNERABLE [0m (this system is not running an hypervisor)
+
+> [46m[30mSUMMARY:[0m [41m[30mCVE-2017-5753:KO[0m [41m[30mCVE-2017-5715:KO[0m [41m[30mCVE-2017-5754:KO[0m [41m[30mCVE-2018-3640:KO[0m [41m[30mCVE-2018-3639:KO[0m [42m[30mCVE-2018-3615:OK[0m [41m[30mCVE-2018-3620:KO[0m [42m[30mCVE-2018-3646:OK[0m
+
+Need more detailed information about mitigation options? Use --explain
+A false sense of security is worse than no security at all, see --disclaimer

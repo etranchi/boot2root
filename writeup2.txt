@@ -1,0 +1,7 @@
+- Se connecter a Laurie en ssh
+
+- Recupérer le code avec curl : https://www.exploit-db.com/raw/40839/ quand logué en ssh
+
+- Compiler le .c avec gcc -pthread *.c -o X -lcrypt
+
+- Le binaire crée un nouvel utilisateur, nous demande un nouveau mot de passe, il suffit de se connecter a ce nouvel utilisateur

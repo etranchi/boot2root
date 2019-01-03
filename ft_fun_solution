@@ -1,0 +1,79 @@
+//file302/*//file431char getme4() {
+//file373char getme7() {//file736char getme1() {
+//file668char getme5() {
+//file601/*//file108}*///file349}
+//file483	return 'a';
+//file722char getme6() {//file697	return 'I';//file138char getme3() {} */
+char getme8() {
+	return 'w';
+}
+/*
+}*/
+char getme9() {
+	return 'n';
+}
+/*
+}*/
+char getme10() {
+	return 'a';
+}
+/*
+}*/
+char getme11() {
+	return 'g';
+}
+/*
+}*/
+char getme12()
+{
+	return 'e';
+}
+/*
+}*/
+int main() {
+	printf("M");
+	printf("Y");
+	printf(" ");
+	printf("P");
+	printf("A");
+	printf("S");
+	printf("S");
+	printf("W");
+	printf("O");
+	printf("R");
+	printf("D");
+	printf(" ");
+	printf("I");
+	printf("S");
+	printf(":");
+	printf(" ");
+	printf("%c",getme1()); // I
+	printf("%c",getme2()); // h
+	printf("%c",getme3()); // e
+	printf("%c",getme4()); // a
+	printf("%c",getme5()); // r
+	printf("%c",getme6()); // t
+	printf("%c",getme7()); // p
+	printf("%c",getme8()); // w
+	printf("%c",getme9()); // n
+	printf("%c",getme10());// a 
+	printf("%c",getme11()); // g
+	printf("%c",getme12()); // e
+	printf("\n");
+	printf("Now SHA-256 it and submit");
+}
+/*
+}
+*///file15}//file432} */
+//file688}
+//file161	return 'e';
+//file540}
+//file632char getme2() {//file314}//file252	return 't';//file102}*///file703}
+//file128/*
+//file497/*//file141/*//file239}*/
+//file271
+//file163	return 'p';
+//file640	return 'r';
+//file254}//file445}//file157/*
+//file256}//file479}//file427}*///file281/*//file596*///file503#include <stdio.h>//file3	return 'h';
+//file687

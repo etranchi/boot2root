@@ -1,0 +1,5 @@
+Executer le script python avec la lib turtle
+
+le mdp est SLASH en maj a hasher en md5
+
+mdp = 646da671ca01bb5d84dbb5fb2238dc8e
